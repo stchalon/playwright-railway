@@ -3,10 +3,12 @@ import re
 from bs4 import BeautifulSoup
 import json
 
-def extract_text_from_medium(url):
-    res = requests.get(url, headers={
+def extract_text_from_medium(url, cookies=None):
+    headers = {
         "User-Agent": "Mozilla/5.0"
-    })
+    }
+
+    res = requests.get(url, headers=headers, cookies=cookies or {})
     html = res.text
 
     # Try __APOLLO_STATE__ first
@@ -23,21 +25,13 @@ def extract_text_from_medium(url):
             if paragraphs:
                 return "\n\n".join(paragraphs)
         except Exception:
-            pass  # Fall through to BeautifulSoup fallback
+            pass
 
-    # Fallback to parsing <article> content
+    # Fallback to <article>
     soup = BeautifulSoup(html, "html.parser")
     article_tag = soup.find("article")
     if not article_tag:
         raise Exception("Could not find <article> tag.")
 
-    text_parts = []
-    for tag in article_tag.find_all(["p", "h1", "h2", "li"]):
-        text = tag.get_text(strip=True)
-        if text:
-            text_parts.append(text)
-
-    if not text_parts:
-        raise Exception("Article appears empty or inaccessible.")
-
-    return "\n\n".join(text_parts)
+    text_parts = [tag.get_text(strip=True) for tag in article_tag.find_all(["p", "h1", "h2", "li"])]
+    return "\n\n".join(filter(None, text_parts))
