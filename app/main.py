@@ -1,6 +1,6 @@
 # Force update
 #
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Request
 from playwright.async_api import async_playwright
 import asyncio
 import logging
