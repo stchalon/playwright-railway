@@ -3,11 +3,13 @@ from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from app.extractor import extract_text_from_medium
 from app.translator import translate_text_to_french
+from typing import Optional, Dict
 
 app = FastAPI()
 
 class ExtractRequest(BaseModel):
     url: str
+    cookies: Optional[Dict[str, str]] = None
 
 class TranslateRequest(BaseModel):
     text: str
@@ -15,7 +17,7 @@ class TranslateRequest(BaseModel):
 @app.post("/extract")
 def extract(req: ExtractRequest):
     try:
-        content = extract_text_from_medium(req.url)
+        content = extract_text_from_medium(req.url, cookies=req.cookies)
         return {"text": content}
     except Exception as e:
         return {"error": str(e)}
