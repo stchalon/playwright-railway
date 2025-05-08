@@ -26,12 +26,12 @@ async def extract_text(url: str = Query(..., description="Medium URL to extract"
 
         # Try article
         try:
-            await page.wait_for_selector("article", timeout=5000)
+            await page.wait_for_selector("article", timeout=10000)
             text = await page.eval_on_selector("article", "el => el.innerText")
         except:
             # Try main as fallback
             try:
-                await page.wait_for_selector("main", timeout=5000)
+                await page.wait_for_selector("main", timeout=10000)
                 text = await page.eval_on_selector("main", "el => el.innerText")
             except:
                 text = "Failed to extract article content."
