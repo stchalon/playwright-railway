@@ -1,11 +1,15 @@
 # Force update
 #
 from fastapi import FastAPI, Query, Request
+from pydantic import BaseModel
 from playwright.async_api import async_playwright
 import asyncio
 import logging
 
 app = FastAPI()
+
+class URLRequest(BaseModel):
+    url: str
 
 @app.get("/screenshot")
 async def screenshot(url: str = Query(..., description="URL to capture")):
@@ -18,8 +22,9 @@ async def screenshot(url: str = Query(..., description="URL to capture")):
         return {"status": "screenshot taken"}
 
 @app.get("/shortextract")
-async def extract(request: Request):
-    url = request.query_params.get("url")
+async def extract(request: URLRequest):
+    #url = request.query_params.get("url")
+    url = request.url
     if not url:
         return {"error": "URL parameter is missing"}
 
