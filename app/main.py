@@ -21,13 +21,25 @@ async def extract_text(url: str):
     async with async_playwright() as p:
         browser = await p.chromium.launch()
         page = await browser.new_page()
-        await page.goto(url)
+        await page.goto(url, timeout=60000)  # Allow longer load time
+        await page.wait_for_load_state("networkidle")
 
-        # Try to extract the article text from <article>
-        article = await page.eval_on_selector("article", "el => el.innerText")
+        text = None
+
+        # Try <article> first
+        try:
+            await page.wait_for_selector("article", timeout=5000)
+            text = await page.eval_on_selector("article", "el => el.innerText")
+        except:
+            # Try a fallback (e.g. div with data-test or role)
+            try:
+                await page.wait_for_selector("main", timeout=5000)
+                text = await page.eval_on_selector("main", "el => el.innerText")
+            except:
+                text = "Failed to extract article content."
+
         await browser.close()
-
-        return {"text": article or "No article content found"}
+        return {"text": text}
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000)
