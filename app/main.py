@@ -3,13 +3,8 @@ from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from app.extractor import extract_text_from_medium
 from app.translator import translate_text_to_french
+from app.summarize import generate_exec_summary
 from typing import Optional, Dict
-
-from sumy.parsers.plaintext import PlaintextParser
-from sumy.nlp.tokenizers import Tokenizer
-from sumy.summarizers.lsa import LsaSummarizer
-import sys
-import os
 
 app = FastAPI()
 
