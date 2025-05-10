@@ -3,4 +3,5 @@ uvicorn
 googletrans==4.0.0-rc1
 requests
 beautifulsoup4
+nltk
 sumy
