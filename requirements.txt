@@ -3,5 +3,5 @@ uvicorn
 googletrans==4.0.0-rc1
 requests
 beautifulsoup4
-nltk
-sumy
+nltk==3.8.1
+sumy==0.10.0
