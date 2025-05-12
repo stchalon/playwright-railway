@@ -8,11 +8,12 @@ from app.translator import translate_text_to_french
 from app.summarize import generate_exec_summary
 from typing import Optional, Dict
 
-from flask import Flask
-from app.tts import tts_handler  # 👈 your new handler
+from fastapi import FastAPI, Request
+from fastapi.responses import StreamingResponse, JSONResponse
+from gtts import gTTS
+import tempfile
 
 app = FastAPI()
-app = Flask(__name__)
 
 class ExtractRequest(BaseModel):
     url: str
