@@ -1,19 +1,16 @@
-from fastapi import APIRouter
 from fastapi.responses import StreamingResponse, JSONResponse
-from pydantic import BaseModel
 from gtts import gTTS
 import tempfile
 
-router = APIRouter()
+async def tts_handler(data: dict):
+    text = data.get("text")
+    lang = data.get("lang", "en")
 
-class TTSRequest(BaseModel):
-    text: str
-    lang: str = "en"
+    if not text:
+        return JSONResponse(status_code=400, content={"error": "Missing 'text'"})
 
-@router.post("/tts")
-async def tts(request: TTSRequest):
     try:
-        tts = gTTS(text=request.text, lang=request.lang)
+        tts = gTTS(text=text, lang=lang)
         tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
         tts.save(tmp.name)
         tmp.close()
