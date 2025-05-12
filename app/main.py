@@ -9,8 +9,7 @@ from app.summarize import generate_exec_summary
 from typing import Optional, Dict
 
 from flask import Flask
-from summarize import summarize_handler
-from tts import tts_handler  # 👈 your new handler
+from app.tts import tts_handler  # 👈 your new handler
 
 app = FastAPI()
 app = Flask(__name__)
