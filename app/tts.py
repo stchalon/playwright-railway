@@ -1,24 +1,25 @@
-from flask import request, send_file, jsonify
+from fastapi import FastAPI, Request
+from fastapi.responses import StreamingResponse, JSONResponse
 from gtts import gTTS
 import tempfile
 
-def tts_handler():
-    data = request.json
+app = FastAPI()
+
+@app.post("/tts")
+async def tts(request: Request):
+    data = await request.json()
     text = data.get("text", "")
-    lang = data.get("lang", "en")  # Default to English
+    lang = data.get("lang", "en")
 
     if not text:
-        return jsonify({"error": "Missing 'text' field"}), 400
+        return JSONResponse(status_code=400, content={"error": "Missing 'text'"})
 
     try:
         tts = gTTS(text=text, lang=lang)
-
-        # Save to a temp file
         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
         tts.save(temp_file.name)
         temp_file.close()
 
-        return send_file(temp_file.name, mimetype="audio/mpeg")
-
+        return StreamingResponse(open(temp_file.name, "rb"), media_type="audio/mpeg")
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return JSONResponse(status_code=500, content={"error": str(e)})
