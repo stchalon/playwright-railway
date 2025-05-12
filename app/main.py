@@ -8,7 +8,12 @@ from app.translator import translate_text_to_french
 from app.summarize import generate_exec_summary
 from typing import Optional, Dict
 
+from flask import Flask
+from summarize import summarize_handler
+from tts import tts_handler  # 👈 your new handler
+
 app = FastAPI()
+app = Flask(__name__)
 
 class ExtractRequest(BaseModel):
     url: str
@@ -43,3 +48,7 @@ async def summarize(request: Request):
     except Exception as e:
         import traceback
         return JSONResponse(status_code=500, content={"error": traceback.format_exc()})
+
+@app.route("/tts", methods=["POST"])
+def tts():
+    return tts_handler()
