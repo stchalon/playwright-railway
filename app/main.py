@@ -10,8 +10,7 @@ from typing import Optional, Dict
 
 from fastapi import FastAPI, Request
 from fastapi.responses import StreamingResponse, JSONResponse
-from gtts import gTTS
-import tempfile
+from app.tts import tts_handler
 
 app = FastAPI()
 
@@ -49,6 +48,10 @@ async def summarize(request: Request):
         import traceback
         return JSONResponse(status_code=500, content={"error": traceback.format_exc()})
 
-@app.route("/tts", methods=["POST"])
-def tts():
-    return tts_handler()
+@app.post("/tts")
+async def tts(request: Request):
+    try:
+        data = await request.json()
+        return await tts_handler(data)
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
